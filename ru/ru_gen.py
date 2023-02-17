@@ -500,6 +500,7 @@ def run(parser, args):
     read_until_client.run(
         first_channel=args.channels[0],
         last_channel=args.channels[-1],
+        max_unblock_read_length_seconds=args.max_unblock_read_length_seconds,
     )
 
     try:

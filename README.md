@@ -55,7 +55,7 @@ dependencies:
   - python=3.8
   - pip
   - pip:
-    - read-until==3.0.0
+    - git+https://github.com/nanoporetech/read_until_api@v3.4.1
     - ont-pyguppy-client-lib==6.4.2
     - git+https://github.com/LooseLab/readfish@dev_staging
 ```
