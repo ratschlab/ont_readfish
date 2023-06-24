@@ -26,7 +26,7 @@ _cli = BASE_ARGS
 
 
 def simple_analysis(
-    client, duration, batch_size=512, throttle=0.4, unblock_duration=0.1
+    client: RUClient, duration, batch_size=512, throttle=0.4, unblock_duration=0.1
 ):
     """Analysis function
 
