@@ -384,11 +384,13 @@ def simple_analysis(
 
         t1 = timer()
         if r > 0:
-            s1 = "{}R/{:.5f}s"
+            s1 = "ReadFish processing speed: {}R/{:.5f}s"
             logger.info(s1.format(r, t1 - t0))
+        
+        # also plot negative throttle to see how much delay there is
+        logger.info("ReadFish throttle: {:.5f}s".format(throttle + t0 - t1))
         # limit the rate at which we make requests
         if t0 + throttle > t1:
-            logger.info("Throttle: {:.5f}s".format(throttle + t0 - t1))
             time.sleep(throttle + t0 - t1)
 
         if interval_checker + interval < t1:
