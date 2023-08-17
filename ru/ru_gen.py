@@ -388,6 +388,7 @@ def simple_analysis(
             logger.info(s1.format(r, t1 - t0))
         # limit the rate at which we make requests
         if t0 + throttle > t1:
+            logger.info("Throttle: {:.5f}s".format(throttle + t0 - t1))
             time.sleep(throttle + t0 - t1)
 
         if interval_checker + interval < t1:
