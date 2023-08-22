@@ -493,7 +493,7 @@ def load_config_toml(filepath, validate=True):
     # Check reference path
     reference_text = toml_dict.get("conditions", {}).get("reference", "")
     reference_path = Path(reference_text)
-    if not reference_path.is_file() and reference_text:
+    if not reference_path.is_file() and (reference_text and reference_text != "fake_mapper"):
         raise FileNotFoundError(
             "Reference file not found at '{}'".format(reference_path)
         )
