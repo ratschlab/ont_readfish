@@ -28,6 +28,8 @@ from ru.utils import (
 )
 from ru.utils import send_message, Severity, get_device, DecisionTracker
 
+from simreaduntil.shared_utils.utils import MutableValue, record_gen_fcn_waiting_time, record_gen_waiting_time
+
 
 _help = "Run targeted sequencing"
 _cli = BASE_ARGS + (
@@ -236,6 +238,7 @@ def simple_analysis(
         # TODO: Fix the logging to just one of the two in use
 
         if not mapper.initialised:
+            logger.info("Sleeping because mapper not yet initialized")
             time.sleep(throttle)
             continue
 
@@ -245,12 +248,15 @@ def simple_analysis(
         unblock_batch_action_list = []
         stop_receiving_action_list = []
 
-        for read_info, read_id, seq_len, results in mapper.map_reads_2(
+        chunk_waiting_time = MutableValue()
+        mapping_waiting_time = MutableValue()
+        for read_info, read_id, seq_len, results in record_gen_fcn_waiting_time(mapper.map_reads_2,
             caller.basecall_minknow(
-                reads=client.get_read_chunks(batch_size=batch_size, last=True),
+                reads=record_gen_waiting_time(client.get_read_chunks(batch_size=batch_size, last=True), waiting_time=chunk_waiting_time),
                 signal_dtype=client.signal_dtype,
                 decided_reads=decided_reads,
-            )
+            ),
+            waiting_time=mapping_waiting_time
         ):
             r += 1
             read_start_time = timer()
@@ -389,6 +395,8 @@ def simple_analysis(
         
             # also plot negative throttle to see how much delay there is
             logger.info("ReadFish throttle: {:.5f}s".format(throttle + t0 - t1))
+            logger.info(f"ReadFish time waiting for chunks: {chunk_waiting_time.value:.5f}s") # to detect if we are waiting for chunks
+            logger.info(f"ReadFish mapping time for chunks: {mapping_waiting_time.value:.5f}s") # to detect if we are waiting for chunks
         # limit the rate at which we make requests
         if t0 + throttle > t1:
             time.sleep(throttle + t0 - t1)
